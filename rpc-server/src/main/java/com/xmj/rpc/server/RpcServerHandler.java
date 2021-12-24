@@ -6,6 +6,8 @@ import com.xmj.rpc.common.util.StringUtil;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import net.sf.cglib.reflect.FastClass;
+import net.sf.cglib.reflect.FastMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +28,7 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
     public void channelRead0(final ChannelHandlerContext ctx, RpcRequest request) throws Exception {
         //创建并初始化RPC响应对象
         RpcResponse response = new RpcResponse();
+        LOGGER.debug("cannelRead0start, request is {}", request);
         response.setRequestId(request.getRequestId());
         try{
             Object result = handle(request);
@@ -34,12 +37,14 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
             LOGGER.error("handler result failuer", e);
             response.setException(e);
         }
+        LOGGER.debug("channelread0 voer, response is {}", response);
         //写入RPC响应对象并自动关闭连接
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
 
     private Object handle(RpcRequest request) throws Exception {
         //获取服务对象
+//        LOGGER.debug("Request is {}", request);
         String serviceName = request.getInterfaceName();
         String serviceVersion = request.getServiceVersion();
         if(StringUtil.isNotEmpty(serviceVersion)) {

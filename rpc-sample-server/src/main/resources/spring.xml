@@ -13,12 +13,12 @@
 
     <!-- 配置服务注册组件-->
     <bean id = "serviceRegistry" class = "com.xmj.rpc.registry.zookeeper.ZooKeeperServiceRegistry">
-        <constructor-arg name ="zkAddress" value="${registry.address}"/>
+        <constructor-arg name ="zkAddress" value="${rpc.registry_address}"/>
     </bean>
 
     <!--配置 RPC 服务器-->
     <bean id = "rpcServer" class = "com.xmj.rpc.server.RpcServer">
-        <constructor-arg name = "serviceAddress" value = "${server.address}"/>
+        <constructor-arg name = "serviceAddress" value = "${rpc.service_address}"/>
         <constructor-arg name = "serviceRegistry" ref = "serviceRegistry"/>
     </bean>
 

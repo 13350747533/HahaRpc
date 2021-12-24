@@ -2,6 +2,7 @@ package com.xmj.rpc.sample.client;
 
 import com.xmj.rpc.client.RpcProxy;
 import com.xmj.rpc.sample.api.HelloService;
+import com.xmj.rpc.sample.api.Person;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -17,7 +18,8 @@ public class HelloClient {
 
         HelloService helloService2 = rpcProxy.create(HelloService.class, "sample.hello2");
         String result2 = helloService2.hello("世界");
-        System.out.println(result);
+//        String result2 = helloService2.hello(new Person(1, "tom"));
+        System.out.println(result2);
 
         System.exit(0);
     }
