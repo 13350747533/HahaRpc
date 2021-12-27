@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Roc服务端处理器
@@ -20,26 +21,46 @@ import java.util.Map;
 public class RpcServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcServerHandler.class);
     private final Map<String, Object> handlerMap;
+    private final ThreadPoolExecutor threadPoolExecutor;
 
-    public RpcServerHandler(Map<String, Object> handlerMap) {
+    public RpcServerHandler(Map<String, Object> handlerMap, ThreadPoolExecutor threadPoolExecutor) {
+        this.threadPoolExecutor = threadPoolExecutor;
         this.handlerMap = handlerMap;
     }
 
     public void channelRead0(final ChannelHandlerContext ctx, RpcRequest request) throws Exception {
-        //创建并初始化RPC响应对象
-        RpcResponse response = new RpcResponse();
-        LOGGER.debug("cannelRead0start, request is {}", request);
-        response.setRequestId(request.getRequestId());
-        try{
-            Object result = handle(request);
-            response.setResult(result);
-        } catch (Exception e) {
-            LOGGER.error("handler result failuer", e);
-            response.setException(e);
-        }
-        LOGGER.debug("channelread0 voer, response is {}", response);
-        //写入RPC响应对象并自动关闭连接
-        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+        threadPoolExecutor.execute(new Runnable() {
+            public void run() {
+                //创建并初始化RPC响应对象
+                RpcResponse response = new RpcResponse();
+                LOGGER.debug("cannelRead0start, request is {}", request);
+                response.setRequestId(request.getRequestId());
+                try{
+                    Object result = handle(request);
+                    response.setResult(result);
+                } catch (Exception e) {
+                    LOGGER.error("handler result failuer", e);
+                    response.setException(e);
+                }
+                LOGGER.debug("channelread0 voer, response is {}", response);
+                //写入RPC响应对象并自动关闭连接
+                ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+            }
+        });
+//        //创建并初始化RPC响应对象
+//        RpcResponse response = new RpcResponse();
+//        LOGGER.debug("cannelRead0start, request is {}", request);
+//        response.setRequestId(request.getRequestId());
+//        try{
+//            Object result = handle(request);
+//            response.setResult(result);
+//        } catch (Exception e) {
+//            LOGGER.error("handler result failuer", e);
+//            response.setException(e);
+//        }
+//        LOGGER.debug("channelread0 voer, response is {}", response);
+//        //写入RPC响应对象并自动关闭连接
+//        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
 
     private Object handle(RpcRequest request) throws Exception {

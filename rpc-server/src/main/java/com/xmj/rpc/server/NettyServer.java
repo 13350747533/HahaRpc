@@ -5,6 +5,7 @@ import com.xmj.rpc.common.bean.RpcResponse;
 import com.xmj.rpc.common.codec.RpcDecoder;
 import com.xmj.rpc.common.codec.RpcEncoder;
 import com.xmj.rpc.common.util.StringUtil;
+import com.xmj.rpc.common.util.ThreadUtil;
 import com.xmj.rpc.registry.ServiceRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -47,9 +48,10 @@ public class NettyServer {
 
     public void start() {
         thread = new Thread(new Runnable() {
-//            ThreadPoolExecutor threadPoolExecutor = ;
-            ExecutorService pool = Executors.newCachedThreadPool();
 
+//            ExecutorService pool = Executors.newCachedThreadPool();
+            ThreadPoolExecutor threadPoolExecutor = ThreadUtil.makeServerThreadPool(NettyServer.class.getSimpleName(),
+        16,32);
             @SneakyThrows
             public void run() {
                 EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -66,7 +68,7 @@ public class NettyServer {
                             //解码，编码，并处理请求
                             pipeline.addLast(new RpcDecoder(RpcRequest.class));
                             pipeline.addLast(new RpcEncoder(RpcResponse.class));
-                            pipeline.addLast(new RpcServerHandler(handlerMap));
+                            pipeline.addLast(new RpcServerHandler(handlerMap, threadPoolExecutor));
                         }
                     }));
                     bootstrap.option(ChannelOption.SO_BACKLOG, 1024);
