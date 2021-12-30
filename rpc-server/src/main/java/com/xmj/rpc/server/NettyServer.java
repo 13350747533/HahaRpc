@@ -72,7 +72,7 @@ public class NettyServer {
                         }
                     }));
                     bootstrap.option(ChannelOption.SO_BACKLOG, 1024);
-                    bootstrap.childOption(ChannelOption.SO_BACKLOG, 1024);
+                    bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
                     //获取RPC服务器的IP和端口号
                     String[] addressArray = StringUtil.split(serviceAddress,":");
                     String ip = addressArray[0];

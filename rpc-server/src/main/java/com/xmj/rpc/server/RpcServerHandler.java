@@ -47,20 +47,6 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
                 ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
             }
         });
-//        //创建并初始化RPC响应对象
-//        RpcResponse response = new RpcResponse();
-//        LOGGER.debug("cannelRead0start, request is {}", request);
-//        response.setRequestId(request.getRequestId());
-//        try{
-//            Object result = handle(request);
-//            response.setResult(result);
-//        } catch (Exception e) {
-//            LOGGER.error("handler result failuer", e);
-//            response.setException(e);
-//        }
-//        LOGGER.debug("channelread0 voer, response is {}", response);
-//        //写入RPC响应对象并自动关闭连接
-//        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
 
     private Object handle(RpcRequest request) throws Exception {
